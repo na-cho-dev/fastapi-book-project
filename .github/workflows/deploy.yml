@@ -22,7 +22,7 @@ jobs:
         run: |
           ssh -o StrictHostKeyChecking=no root@165.232.153.54 << 'EOF'
             if [ ! -d "/home/fastapi-book-project" ]; then
-                git clone https://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@github.com/na-cho-dev/fastapi-book-project.git /home/
+                git clone https://${{ secrets.GH_TOKEN }}@github.com/na-cho-dev/fastapi-book-project.git /home/fastapi-book-project
             fi
             cd /home/fastapi-book-project
             git pull origin main
