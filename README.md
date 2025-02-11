@@ -79,6 +79,85 @@ uvicorn main:app
 - Swagger UI: http://localhost:8000/docs
 - ReDoc: http://localhost:8000/redoc
 
+
+## CI/CD Pipeline
+
+- **CI Pipeline:**
+
+  - Triggered on pull requests to the main branch.
+
+  - Runs pytest to ensure all tests pass.
+
+  - Fails the workflow if any test fails.
+
+- **CD Pipeline:**
+
+  - Triggered on merging to the main branch.
+
+  - Deploys the latest version to the server using SSH and systemd.
+
+
+## Deployment
+### 1. Set up the Server
+- Clone the repository on your server:
+```bash
+git clone git@github.com:na-cho-dev/fastapi-book-project.git /home/fastapi-book-project
+```
+- Create and activate a virtual environment:
+```bash
+cd /home/fastapi-book-project
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+### 2. Create a systemd service file:
+Create /etc/systemd/system/fastapi-book-project.service with the following content:
+```ini
+[Unit]
+Description=FastAPI Book Project Application
+After=network.target
+
+[Service]
+User=root
+WorkingDirectory=/home/fastapi-book-project
+ExecStart=/home/fastapi-book-project/venv/bin/uvicorn main:app --host 127.0.0.1 --port 8000
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+```
+### 3. Enable and start the service:
+```bash
+sudo systemctl daemon-reload
+sudo systemctl enable fastapi-book-project
+sudo systemctl start fastapi-book-project
+sudo systemctl status fastapi-book-project
+```
+### 4. Configure Nginx: 
+Create a new Nginx configuration file in /etc/nginx/sites-available/fastapi-book-project:
+```nginx
+server {
+    listen 80;
+    server_name your_domain_or_ip;
+
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+}
+```
+Enable the configuration and restart Nginx:
+```bash
+sudo ln -s /etc/nginx/sites-available/fastapi-book-project /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl restart nginx
+```
+### 5. Access the API:  
+Visit: `http://your_domain_or_ip/api/v1/books/{book_id}` to retrieve a book by its ID.
+
 ## API Endpoints
 
 ### Books
