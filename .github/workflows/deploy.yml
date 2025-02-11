@@ -29,5 +29,6 @@ jobs:
             python3 -m venv venv
             source venv/bin/activate
             pip install -r requirements.txt
-            sudo systemctl restart fastapi-app
+            sudo systemctl daemon-reload
+            sudo systemctl restart fastapi-book-project
           EOF
