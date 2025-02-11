@@ -21,7 +21,7 @@ jobs:
       - name: Deploy to Server
         run: |
           ssh -o StrictHostKeyChecking=no root@165.232.153.54 << 'EOF'
-            if [ ! -d "/home/ubuntu/fastapi-book-project" ]; then
+            if [ ! -d "/home/fastapi-book-project" ]; then
                 git clone https://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@github.com/na-cho-dev/fastapi-book-project.git /home/
             fi
             cd /home/fastapi-book-project
